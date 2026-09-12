@@ -1,0 +1,15 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
+const { getTasks, createTask, updateTask, deleteTask, exportTasks } = require('../controllers/taskController');
+
+// All routes below are protected
+router.use(protect);
+
+// Export must come before /:id to avoid route collision
+router.get('/export', exportTasks);
+
+router.route('/').get(getTasks).post(createTask);
+router.route('/:id').put(updateTask).delete(deleteTask);
+
+module.exports = router;
