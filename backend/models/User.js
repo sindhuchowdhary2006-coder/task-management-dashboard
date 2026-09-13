@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'member'],
       default: 'member',
     },
+    // Every user belongs to exactly one team
+    teamId: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

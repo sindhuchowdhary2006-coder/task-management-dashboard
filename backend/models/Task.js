@@ -29,10 +29,21 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    userId: {
+    // The team this task belongs to
+    teamId: {
+      type: String,
+      required: [true, 'Team ID is required'],
+    },
+    // The member this task is assigned to
+    assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: [true, 'User ID is required'],
+      required: [true, 'assignedTo user is required'],
+    },
+    // The admin who created the task
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }

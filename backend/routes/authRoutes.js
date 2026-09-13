@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login } = require('../controllers/authController');
+const { signup, login, getTeams } = require('../controllers/authController');
 
-// POST /api/auth/signup
 router.post('/signup', signup);
-
-// POST /api/auth/login
 router.post('/login', login);
+
+// Public route — lets member signup page list all teams
+router.get('/teams', getTeams);
 
 module.exports = router;
