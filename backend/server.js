@@ -12,22 +12,22 @@ connectDB();
 
 const app = express();
 
-// CORS — allow your Vercel frontend origin in production
+// CORS — open in development, locked to FRONTEND_URL in production
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:5000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, mobile apps)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS policy: origin ${origin} not allowed`));
-      }
+      // Allow requests with no origin (Postman, curl) OR any localhost in dev
+      if (!origin) return callback(null, true);
+      if (process.env.NODE_ENV === 'development') return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS policy: origin ${origin} not allowed`));
     },
     credentials: true,
   })
