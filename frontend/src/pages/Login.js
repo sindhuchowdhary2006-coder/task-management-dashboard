@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
+import Background3D from '../components/Background3D';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -16,12 +17,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!form.email || !form.password) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-
+    if (!form.email || !form.password) { toast.error('Please fill in all fields'); return; }
     setLoading(true);
     try {
       const { data } = await API.post('/auth/login', form);
@@ -36,60 +32,41 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="card">
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      <Background3D />
+      <div className="w-full max-w-md relative z-10">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-blue-600">TaskFlow</h1>
-            <p className="text-gray-500 mt-1">Sign in to your account</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 border border-blue-400/30 mb-3">
+              <span className="text-3xl">⚡</span>
+            </div>
+            <h1 className="text-3xl font-bold text-white">TaskFlow</h1>
+            <p className="text-blue-200 mt-1">Sign in to your account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                className="input-field"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={handleChange}
-                autoComplete="email"
-                required
-              />
+              <label htmlFor="email" className="block text-sm font-medium text-blue-100 mb-1">Email</label>
+              <input id="email" type="email" name="email"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                placeholder="you@example.com" value={form.email} onChange={handleChange} required />
             </div>
-
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                className="input-field"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={handleChange}
-                autoComplete="current-password"
-                required
-              />
+              <label htmlFor="password" className="block text-sm font-medium text-blue-100 mb-1">Password</label>
+              <input id="password" type="password" name="password"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                placeholder="••••••••" value={form.password} onChange={handleChange} required />
             </div>
-
-            <button type="submit" className="btn-primary w-full flex justify-center items-center gap-2" disabled={loading}>
+            <button type="submit" disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/30">
               {loading && <Spinner size="sm" />}
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-5">
+          <p className="text-center text-sm text-blue-200 mt-5">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-600 hover:underline font-medium">
-              Sign up
-            </Link>
+            <Link to="/signup" className="text-white hover:underline font-medium">Sign up</Link>
           </p>
         </div>
       </div>

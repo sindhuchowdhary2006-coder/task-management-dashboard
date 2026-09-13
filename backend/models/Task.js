@@ -17,8 +17,17 @@ const taskSchema = new mongoose.Schema(
       enum: ['pending', 'in-progress', 'completed'],
       default: 'pending',
     },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium',
+    },
     dueDate: {
       type: Date,
+    },
+    completedAt: {
+      type: Date,
+      default: null,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -28,5 +37,16 @@ const taskSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Auto-set completedAt when status changes to completed
+taskSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate();
+  if (update && update.status === 'completed') {
+    update.completedAt = new Date();
+  } else if (update && update.$set && update.$set.status === 'completed') {
+    update.$set.completedAt = new Date();
+  }
+  next();
+});
 
 module.exports = mongoose.model('Task', taskSchema);

@@ -15,13 +15,14 @@ const app = express();
 // CORS — allow your Vercel frontend origin in production
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL, // set this on Render to your Vercel URL
+  'http://localhost:5000',
+  process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman)
+      // Allow requests with no origin (Postman, curl, mobile apps)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -37,6 +38,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/analytics', require('./routes/analyticsRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Health check
 app.get('/', (req, res) => {
