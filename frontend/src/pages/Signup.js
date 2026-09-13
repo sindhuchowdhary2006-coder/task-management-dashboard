@@ -4,17 +4,16 @@ import toast from 'react-hot-toast';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import Spinner from '../components/Spinner';
-import Background3D from '../components/Background3D';
 
 const Signup = () => {
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'member', teamId: '', teamName: '' });
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [teams, setTeams] = useState([]);
   const [teamsLoading, setTeamsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch available teams when role = member
   useEffect(() => {
     if (form.role === 'member') {
       setTeamsLoading(true);
@@ -25,20 +24,38 @@ const Signup = () => {
     }
   }, [form.role]);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
+    setErrorMsg('');
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) { toast.error('Please fill in all fields'); return; }
-    if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
-    if (form.role === 'member' && !form.teamId) { toast.error('Please select a team to join'); return; }
+    setErrorMsg('');
+
+    if (!form.name || !form.email || !form.password) {
+      setErrorMsg('Please fill in all fields.');
+      return;
+    }
+    if (form.password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters.');
+      return;
+    }
+    if (form.role === 'member' && !form.teamId) {
+      setErrorMsg('Please select or enter a Team ID to join.');
+      return;
+    }
 
     setLoading(true);
     try {
-      const payload = { name: form.name, email: form.email, password: form.password, role: form.role };
+      const payload = {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+      };
       if (form.role === 'admin') payload.teamName = form.teamName || `${form.name}'s Team`;
-      if (form.role === 'member') payload.teamId = form.teamId;
+      if (form.role === 'member') payload.teamId = form.teamId.trim();
 
       const { data } = await API.post('/auth/signup', payload);
       login(data.user, data.token, data.team);
@@ -49,7 +66,9 @@ const Signup = () => {
       );
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Signup failed');
+      const msg = err.response?.data?.message || err.message || 'Signup failed. Please try again.';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -70,8 +89,14 @@ const Signup = () => {
             <p className="text-blue-200 mt-1">Create your account</p>
           </div>
 
+          {/* Inline error box */}
+          {errorMsg && (
+            <div className="mb-4 bg-red-500/20 border border-red-400/40 rounded-lg px-4 py-3">
+              <p className="text-red-200 text-sm font-medium">❌ {errorMsg}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {/* Role selector first — changes the rest of the form */}
             <div>
               <label className="block text-sm font-medium text-blue-100 mb-1">I am signing up as</label>
               <select name="role" value={form.role} onChange={handleChange} className={selectClass}>
@@ -98,27 +123,26 @@ const Signup = () => {
                 value={form.password} onChange={handleChange} required />
             </div>
 
-            {/* Admin: optional team name */}
             {form.role === 'admin' && (
               <div>
                 <label className="block text-sm font-medium text-blue-100 mb-1">
-                  Team Name <span className="text-blue-300 text-xs">(optional — defaults to "{form.name || 'Your'}'s Team")</span>
+                  Team Name <span className="text-blue-300 text-xs">(optional)</span>
                 </label>
-                <input type="text" name="teamName" className={inputClass} placeholder="e.g. Engineering Team"
+                <input type="text" name="teamName" className={inputClass}
+                  placeholder={`e.g. ${form.name || 'Your'}'s Team`}
                   value={form.teamName} onChange={handleChange} />
               </div>
             )}
 
-            {/* Member: select team from dropdown */}
             {form.role === 'member' && (
               <div>
-                <label className="block text-sm font-medium text-blue-100 mb-1">Select Team to Join</label>
+                <label className="block text-sm font-medium text-blue-100 mb-1">Team ID</label>
                 {teamsLoading ? (
-                  <div className="flex items-center gap-2 text-blue-200 text-sm py-2"><Spinner size="sm" /> Loading teams...</div>
-                ) : teams.length === 0 ? (
-                  <p className="text-yellow-300 text-sm py-2">No teams found. Ask your admin to sign up first and share the Team ID.</p>
-                ) : (
-                  <select name="teamId" value={form.teamId} onChange={handleChange} className={selectClass} required>
+                  <div className="flex items-center gap-2 text-blue-200 text-sm py-2">
+                    <Spinner size="sm" /> Loading teams...
+                  </div>
+                ) : teams.length > 0 ? (
+                  <select name="teamId" value={form.teamId} onChange={handleChange} className={selectClass}>
                     <option value="">— Select a team —</option>
                     {teams.map((t) => (
                       <option key={t.teamId} value={t.teamId}>
@@ -126,15 +150,23 @@ const Signup = () => {
                       </option>
                     ))}
                   </select>
+                ) : (
+                  <p className="text-yellow-300 text-xs bg-yellow-500/10 border border-yellow-400/20 rounded-lg px-3 py-2 mb-2">
+                    No teams found. Ask your admin to sign up first and share the Team ID.
+                  </p>
                 )}
-                <p className="text-blue-300 text-xs mt-1">Don't see your team? Ask your admin for the Team ID and enter it directly:</p>
-                <input type="text" name="teamId" className={`${inputClass} mt-1`} placeholder="Paste Team ID manually (e.g. T-AB12CD34)"
-                  value={form.teamId} onChange={handleChange} />
+                <input
+                  type="text" name="teamId" className={`${inputClass} mt-2`}
+                  placeholder="Or paste Team ID manually (e.g. T-AB12CD34)"
+                  value={form.teamId} onChange={handleChange}
+                />
               </div>
             )}
 
-            <button type="submit" disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/30 mt-2">
+            <button
+              type="submit" disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/30 mt-2"
+            >
               {loading && <Spinner size="sm" />}
               {loading ? 'Creating account...' : form.role === 'admin' ? '🚀 Create Team & Sign Up' : '👥 Join Team & Sign Up'}
             </button>
