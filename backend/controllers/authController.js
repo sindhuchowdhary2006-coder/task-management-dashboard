@@ -35,25 +35,24 @@ const signup = async (req, res, next) => {
     let resolvedTeamId = null;
 
     if (assignedRole === 'admin') {
-      // ── Admin: auto-create a new Team ──
-      const tName = teamName?.trim() || `${name}'s Team`;
-      const team = await Team.create({ teamName: tName, adminId: 'PLACEHOLDER' });
-      resolvedTeamId = team.teamId;
-
+      // ── Admin: create user first, then create Team with real adminId ──
       const user = await User.create({
         name, email, password: hashedPassword,
-        role: 'admin', teamId: resolvedTeamId,
+        role: 'admin', teamId: null, // temporary, updated below
       });
 
-      // Link team's adminId to the real user now
-      team.adminId = user._id;
-      await team.save();
+      const tName = teamName?.trim() || `${name}'s Team`;
+      const team = await Team.create({ teamName: tName, adminId: user._id });
+
+      // Link user to the team
+      user.teamId = team.teamId;
+      await user.save();
 
       const token = generateToken(user._id);
       return res.status(201).json({
         success: true,
         token,
-        user: { id: user._id, name: user.name, email: user.email, role: user.role, teamId: resolvedTeamId },
+        user: { id: user._id, name: user.name, email: user.email, role: user.role, teamId: team.teamId },
         team: { teamId: team.teamId, teamName: team.teamName },
       });
     }

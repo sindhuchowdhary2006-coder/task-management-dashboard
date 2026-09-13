@@ -61,7 +61,7 @@ const TaskForm = ({ onTaskSaved, editingTask, onCancelEdit, teamMembers = [] }) 
 
   return (
     <div className="card">
-      <h2 className="text-lg font-semibold mb-4">{editingTask ? 'Edit Task' : '➕ Create & Assign Task'}</h2>
+      <h2 className="text-lg font-semibold mb-4 text-white">{editingTask ? 'Edit Task' : '➕ Create & Assign Task'}</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input className="input-field" type="text" name="title" placeholder="Task title *"
           value={form.title} onChange={handleChange} required />
@@ -84,11 +84,11 @@ const TaskForm = ({ onTaskSaved, editingTask, onCancelEdit, teamMembers = [] }) 
 
         {/* Assign to team member — required for admins */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Assign To <span className="text-red-500">*</span>
+          <label className="block text-sm font-medium text-white/70 mb-1">
+            Assign To <span className="text-red-400">*</span>
           </label>
           {teamMembers.length === 0 ? (
-            <p className="text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
+            <p className="text-sm text-yellow-300 bg-yellow-500/10 border border-yellow-400/20 rounded-lg px-3 py-2">
               No team members yet. Members need to sign up and join your team first.
             </p>
           ) : (

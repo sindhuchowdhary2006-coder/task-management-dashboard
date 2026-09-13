@@ -117,18 +117,18 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 py-6">
 
         {/* Title + alerts */}
         <div className="flex items-center gap-3 mb-5 flex-wrap">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-white">
             {isAdmin ? '👑 Admin Dashboard' : '👤 My Tasks'}
           </h1>
           {team && (
-            <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">
+            <span className="bg-blue-500/30 text-blue-200 border border-blue-400/30 text-xs font-bold px-2.5 py-1 rounded-full">
               {team.teamName}
             </span>
           )}
@@ -143,13 +143,13 @@ const Dashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
           {tabs.map(({ key, label }) => (
             <div key={key} className="card text-center">
-              <p className="text-2xl font-bold text-blue-600">{counts[key]}</p>
-              <p className="text-sm text-gray-500">{label}</p>
+              <p className="text-2xl font-bold text-blue-400">{counts[key]}</p>
+              <p className="text-sm text-blue-200">{label}</p>
             </div>
           ))}
           <div className="card text-center">
-            <p className="text-2xl font-bold text-red-500">{counts.overdue}</p>
-            <p className="text-sm text-gray-500">Overdue</p>
+            <p className="text-2xl font-bold text-red-400">{counts.overdue}</p>
+            <p className="text-sm text-blue-200">Overdue</p>
           </div>
         </div>
 
@@ -165,9 +165,9 @@ const Dashboard = () => {
 
         {/* Member info panel */}
         {!isAdmin && (
-          <div className="card mb-6 bg-blue-50 border border-blue-100">
-            <p className="text-sm text-blue-700">
-              Showing tasks assigned to <strong>{user?.name}</strong> in team <strong>{team?.teamName}</strong>.
+          <div className="card mb-6 bg-blue-500/10 border border-blue-400/20">
+            <p className="text-sm text-blue-200">
+              Showing tasks assigned to <strong className="text-white">{user?.name}</strong> in team <strong className="text-white">{team?.teamName}</strong>.
               Contact your admin to create or reassign tasks.
             </p>
           </div>
@@ -182,7 +182,9 @@ const Dashboard = () => {
             {tabs.map(({ key, label }) => (
               <button key={key} onClick={() => setActiveTab(key)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  activeTab === key ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                  activeTab === key
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white/10 text-white/70 border border-white/20 hover:bg-white/20'
                 }`}>
                 {label} ({counts[key]})
               </button>
@@ -206,7 +208,7 @@ const Dashboard = () => {
         {/* Analytics */}
         {tasks.length > 0 && (
           <div className="mt-8 space-y-6">
-            <h2 className="text-lg font-bold text-gray-700">Analytics</h2>
+            <h2 className="text-lg font-bold text-white">Analytics</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <StatusBarChart tasks={tasks} />
               <CompletionLineChart tasks={tasks} />
