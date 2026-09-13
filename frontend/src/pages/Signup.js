@@ -60,7 +60,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden py-8">
-      <Background3D />
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-6">

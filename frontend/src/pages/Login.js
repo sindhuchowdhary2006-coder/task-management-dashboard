@@ -21,7 +21,7 @@ const Login = () => {
     setLoading(true);
     try {
       const { data } = await API.post('/auth/login', form);
-      login(data.user, data.token);
+      login(data.user, data.token, data.team);
       toast.success(`Welcome back, ${data.user.name}!`);
       navigate('/dashboard');
     } catch (err) {
@@ -33,7 +33,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
-      <Background3D />
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8">
           <div className="text-center mb-6">
